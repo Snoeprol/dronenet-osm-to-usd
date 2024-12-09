@@ -1,0 +1,44 @@
+#usda 1.0
+(
+    metersPerUnit = 1
+)
+
+def "World"
+{
+    def Mesh "Ground"
+    {
+        int[] faceVertexCounts = [4]
+        int[] faceVertexIndices = [0, 1, 2, 3]
+        rel material:binding = </World/Ground/material>
+        point3f[] points = [(-3000, -0.1, -3000), (3000, -0.1, -3000), (3000, -0.1, 3000), (-3000, -0.1, 3000)]
+        texCoord2f[] primvars:st = [(0, 1), (1, 1), (1, 0), (0, 0)] (
+            interpolation = "varying"
+        )
+
+        def Material "material"
+        {
+            def Shader "PBRShader"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                color3f inputs:diffuseColor.connect = </World/Ground/material/diffuseTexture.outputs:rgb>
+                float inputs:opacity = 0.95
+            }
+
+            def Shader "stReader"
+            {
+                uniform token info:id = "UsdPrimvarReader_float2"
+                token inputs:varname = "st"
+                float2 outputs:result
+            }
+
+            def Shader "diffuseTexture"
+            {
+                uniform token info:id = "UsdUVTexture"
+                asset inputs:file = @/home/mario/dronenet/osm-to-usd/output/den_helder_map.png@
+                float2 inputs:st.connect = </World/Ground/material/stReader.outputs:result>
+                color3f outputs:rgb
+            }
+        }
+    }
+}
+

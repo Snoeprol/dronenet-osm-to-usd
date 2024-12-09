@@ -1,0 +1,43 @@
+#usda 1.0
+
+def "World"
+{
+    def Mesh "Surface"
+    {
+        int[] faceVertexCounts = [4]
+        int[] faceVertexIndices = [0, 1, 2, 3]
+        rel material:binding = </World/Surface/Material>
+        point3f[] points = [(-5, 0, -5), (5, 0, -5), (5, 0, 5), (-5, 0, 5)]
+        texCoord2f[] primvars:st = [(0, 0), (1, 0), (1, 1), (0, 1)] (
+            interpolation = "varying"
+        )
+
+        def Material "Material"
+        {
+            token outputs:surface.connect = </World/Surface/Material/PBRShader.outputs:surface>
+
+            def Shader "PBRShader"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                color3f inputs:diffuseColor.connect = </World/Surface/Material/diffuseTexture.outputs:rgb>
+                token outputs:surface
+            }
+
+            def Shader "stReader"
+            {
+                uniform token info:id = "UsdPrimvarReader_float2"
+                token inputs:varname = "st"
+                float2 outputs:result
+            }
+
+            def Shader "diffuseTexture"
+            {
+                uniform token info:id = "UsdUVTexture"
+                asset inputs:file = @/home/mario/dronenet/osm-to-usd/src/basics/../../output/ground_texture.png@
+                float2 inputs:st.connect = </World/Surface/Material/stReader.outputs:result>
+                color3f outputs:rgb
+            }
+        }
+    }
+}
+

@@ -1,0 +1,24 @@
+#usda 1.0
+
+def Xform "World"
+{
+    def Cube "Cube"
+    {
+        rel material:binding = </World/Cube/Material>
+
+        def Material "Material"
+        {
+            token outputs:surface.connect = </World/Cube/Material/PBRShader.outputs:surface>
+
+            def Shader "PBRShader"
+            {
+                uniform token info:implementationSource = "sourceAsset"
+                uniform asset info:mdl:sourceAsset = @OmniPBR.mdl@
+                uniform token info:sourceAsset:subIdentifier = "OmniPBR"
+                asset inputs:diffuse_texture = @/home/mario/dronenet/osm-to-usd/src/examples/../../assets/ground_texture.png@
+                token outputs:surface
+            }
+        }
+    }
+}
+

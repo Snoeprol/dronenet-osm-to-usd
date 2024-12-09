@@ -1,0 +1,43 @@
+#usda 1.0
+
+def "World"
+{
+    def Cube "Cube"
+    {
+        rel material:binding = </World/Cube/Material>
+        texCoord2f[] primvars:st = [(0, 0), (1, 0), (1, 1), (0, 1), (0, 0), (1, 0), (1, 1), (0, 1), (0, 0), (1, 0), (1, 1), (0, 1), (0, 0), (1, 0), (1, 1), (0, 1), (0, 0), (1, 0), (1, 1), (0, 1), (0, 0), (1, 0), (1, 1), (0, 1)] (
+            interpolation = "faceVarying"
+        )
+        int[] primvars:st:indices = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]
+
+        def Material "Material"
+        {
+            token outputs:surface.connect = </World/Cube/Material/PBRShader.outputs:surface>
+
+            def Shader "PBRShader"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                color3f inputs:diffuseColor.connect = </World/Cube/Material/diffuseTexture.outputs:rgb>
+                token outputs:surface
+            }
+
+            def Shader "stReader"
+            {
+                uniform token info:id = "UsdPrimvarReader_float2"
+                token inputs:varname = "st"
+                float2 outputs:result
+            }
+
+            def Shader "diffuseTexture"
+            {
+                uniform token info:id = "UsdUVTexture"
+                asset inputs:file = @/home/mario/dronenet/osm-to-usd/src/basics/../../output/ground_texture.png@
+                float2 inputs:st.connect = </World/Cube/Material/stReader.outputs:result>
+                token inputs:wrapS = "repeat"
+                token inputs:wrapT = "repeat"
+                color3f outputs:rgb
+            }
+        }
+    }
+}
+

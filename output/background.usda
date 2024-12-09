@@ -1,0 +1,52 @@
+#usda 1.0
+(
+    metersPerUnit = 1
+    upAxis = "Y"
+)
+
+def "World"
+{
+    def Camera "Camera"
+    {
+        float horizontalAperture = 20.955
+        token projection = "orthographic"
+        float verticalAperture = 20.955
+    }
+
+    def Mesh "Background"
+    {
+        int[] faceVertexCounts = [4]
+        int[] faceVertexIndices = [0, 1, 2, 3]
+        rel material:binding = </World/Background/material>
+        point3f[] points = [(-10, -10, -1), (10, -10, -1), (10, 10, -1), (-10, 10, -1)]
+        texCoord2f[] primvars:st = [(0, 0), (1, 0), (1, 1), (0, 1)] (
+            interpolation = "varying"
+        )
+        uniform token purpose = "background"
+
+        def Material "material"
+        {
+            def Shader "PBRShader"
+            {
+                uniform token info:id = "UsdPreviewSurface"
+                color3f inputs:emissiveColor.connect = </World/Background/material/diffuseTexture.outputs:rgb>
+            }
+
+            def Shader "stReader"
+            {
+                uniform token info:id = "UsdPrimvarReader_float2"
+                token inputs:varname = "st"
+                float2 outputs:result
+            }
+
+            def Shader "diffuseTexture"
+            {
+                uniform token info:id = "UsdUVTexture"
+                asset inputs:file = @output/background_tile.png@
+                float2 inputs:st.connect = </World/Background/material/stReader.outputs:result>
+                color3f outputs:rgb
+            }
+        }
+    }
+}
+
